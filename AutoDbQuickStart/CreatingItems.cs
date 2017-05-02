@@ -20,37 +20,8 @@ namespace AutoDbQuickStart
 
     public class CreatingItems
     {
-        private ITestOutputHelper _output;
-
-        public CreatingItems(ITestOutputHelper output)
-        {
-            this._output = output;
-        }
-
-        [Fact(Skip="Temporary diagnostic test")]
-        public void WhereAmI()
-        {
-            string path = System.IO.Directory.GetCurrentDirectory();
-            System.IO.Directory.GetFiles(path).Select(s => s.EndsWith("license.xml")).Count().Should().BeGreaterThan(0);
-            
-            path.Should().Be("");
-        }
-
         [Fact]
-        public void FakeDBWorking()
-        {
-            using (var db = new Db
-            {
-                new DbItem("Home") {{"Title", "Welcome!"}}
-            })
-            {
-                Sitecore.Data.Items.Item home = db.GetItem("/sitecore/content/home");
-                Xunit.Assert.Equal("Welcome!", home["Title"]);
-            }
-        }
-
-        [Fact]
-        public void MakeItem()
+        public void AutoContentCustomizationAddsItemsToDb()
         { 
             IFixture fixture = new Fixture();
             fixture.Customize(new AutoDbCustomization()).Customize(new AutoContentItemCustomization());
@@ -80,14 +51,6 @@ namespace AutoDbQuickStart
         [Fact]
         public void CanCreateItemTree()
         {
-            Database database = new Fixture().Customize(new AutoDbCustomization()).Customize( new BuildTreeCustomization()).Create<Database>();
-            database.Should().NotBeNull();
-            database.GetItem("/sitecore/content/a/b/c").Should().NotBeNull();
-        }
-
-        [Fact]
-        public void CanCreateItemTreeWithPostProcessor()
-        {
             Db db = new Fixture().Customize(new AutoDbCustomization()).Customize(new AddABC()).Create<Db>();
             db.Should().NotBeNull();
             db.GetItem("/sitecore/content/a/b/c").Should().NotBeNull();
@@ -106,31 +69,32 @@ namespace AutoDbQuickStart
         }
 
 
-        [Fact]
-        public void CanDefineCustomizations()
-        {
-            IFixture fixture = new Fixture();
-            fixture.Customize(new AutoDbCustomization())
-                .Customize(new AddABC())
-                .Customize(new AddXYZ());
-            Db db = fixture.Create<Db>();
-            db.GetItem("/sitecore/content/a/b/c").Should().NotBeNull();
-            db.GetItem("/sitecore/content/x/y/z").Should().NotBeNull();
-        }
-
         [Theory, AutoAbcXyzTree]
-        public void AutoDbData(Db db)
+        public void AutoDbDataCanShowOneTree(Db db)
         {
             db.GetItem("/sitecore/content/a/b/c").Should().NotBeNull();
             db.GetItem("/sitecore/content/x/y/z").Should().NotBeNull();
         }
 
+        [Theory, AutoAbcTree]
+        public void AutoDbDataCanCombineTrees(Db db)
+        {
+            db.GetItem("/sitecore/content/a/b/c").Should().NotBeNull();
+            db.GetItem("/sitecore/content/x/y/z").Should().BeNull();
+        }
+    }
 
+    internal class AutoAbcTreeAttribute : AutoDataAttribute
+    {
+        public AutoAbcTreeAttribute()
+        {
+            Fixture.Customize(new AutoDbCustomization())
+                .Customize(new AddABC());
+        }
     }
 
     internal class AutoAbcXyzTreeAttribute : AutoDataAttribute
     {
-
         public AutoAbcXyzTreeAttribute()
         {
             Fixture.Customize(new AutoDbCustomization())
