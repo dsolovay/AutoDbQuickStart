@@ -15,24 +15,20 @@ namespace AutoDbQuickStart
 {
     public class SetContextItem
     {
-         
-
         [Theory,AutoContextData]
         public void CanCreateContextItem(Db db, [ContextItem]Item item)
         {
             Context.Item.Should().NotBeNull();
             Context.Item.ID.Should().Be(item.ID);
         }
-
-
+        
         [Theory, AutoContextData]
         public void CanCreateNonContextItem(Db db, Item item)
         {
             Context.Item.Should().BeNull();
             item.Should().NotBeNull();
         }
-
-
+        
         [Theory, AutoContextData]
         public void CanCreateNonContextItemSecond(Db db, [ContextItem]Item contextItem, Item nonContextItem)
         {
@@ -63,7 +59,6 @@ namespace AutoDbQuickStart
             Fixture.Customize(new AutoContentDbItemCustomization());
             Fixture.Customizations.Add(new Postprocessor(new ContextAttributeRelay(), new MakeContextItemCommand()));
         }
-
     }
 
     public class ContextAttributeRelay : ISpecimenBuilder
