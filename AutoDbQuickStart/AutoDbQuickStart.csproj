@@ -91,6 +91,7 @@
     <Compile Include="AddABC.cs" />
     <Compile Include="CreatingItems.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SetContextItem.cs" />
     <Compile Include="SiteCreation.cs" />
   </ItemGroup>
   <ItemGroup>
